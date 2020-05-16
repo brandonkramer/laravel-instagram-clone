@@ -1,0 +1,49 @@
+name: instagram-clone
+recipe: laravel
+config:
+  webroot: app/public
+  php: '7.4'
+  via: nginx
+  database: mysql
+  xdebug: true
+  config:
+    # https://github.com/lando/lando/blob/master/plugins/lando-services/services/php/php.ini
+    php: config/php.ini
+    # Config/httpd.conf for apache or  config/nginx.conf for nginx
+    # https://github.com/lando/lando/blob/master/plugins/lando-services/services/nginx/nginx.conf.tpl
+    server: config/nginx.conf
+services:
+  node:
+    type: node
+    overrides:
+      # Make ports in node environment available to localhost
+      ports:
+        - 3000:3000
+        - 8000:8000
+    globals:
+      gulp-cli: latest
+  mailhog:
+    type: mailhog
+    hogfrom:
+      - appserver
+  pma:
+    type: phpmyadmin
+    hosts:
+      - database
+tooling:
+  npm:
+    service: node
+  node:
+    service: node
+  gulp:
+    service: node
+  yarn:
+    service: node
+proxy:
+  # Appserver_nginx or appserver for apache
+  appserver_nginx:
+    - laravel-instagram-clone.lndo.site
+  mailhog:
+    - mail.laravel-instagram-clone.lndo.site
+  pma:
+    - pma.laravel-instagram-clone.lndo.site
